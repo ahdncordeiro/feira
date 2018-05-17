@@ -1,6 +1,6 @@
 ---
 name: Everything else
-about: Describe this issue template's purpose here.
+about: Create a issue for everything else
 
 ---
 
