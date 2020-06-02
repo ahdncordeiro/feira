@@ -1,0 +1,68 @@
+plugins {
+    id 'application'
+    id 'idea'
+    id 'io.spring.dependency-management' version '1.0.9.RELEASE'
+    id 'java'
+    id 'org.springframework.boot' version '2.3.0.RELEASE'
+}
+
+repositories {
+    mavenCentral()
+}
+
+group = 'com.andrecordeiro'
+version = '0.0.1-SNAPSHOT'
+
+apply plugin: 'application'
+apply plugin: 'idea'
+apply plugin: 'io.spring.dependency-management'
+apply plugin: 'java'
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_14
+    targetCompatibility = JavaVersion.VERSION_14
+    withJavadocJar() //TODO verificar
+    withSourcesJar() //TODO verificar
+}
+
+sourceSets {
+    integrationTest {
+        compileClasspath += sourceSets.main.output + configurations.testCompile
+        runtimeClasspath += sourceSets.main.output + configurations.testRuntime
+    }
+}
+
+idea {
+    module {
+        testSourceDirs += sourceSets.integrationTest.java.srcDirs
+        testResourceDirs += sourceSets.integrationTest.resources.srcDirs
+        scopes.TEST.plus += [configurations.integrationTestCompile]
+    }
+}
+
+configurations {
+    integrationTestImplementation.extendsFrom testImplementation
+    integrationTestRuntimeOnly.extendsFrom testRuntimeOnly
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter'
+//    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+
+    testImplementation('org.springframework.boot:spring-boot-starter-test') {
+        exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+    }
+}
+
+test {
+    useJUnitPlatform()
+}
+
+task integrationTest(type: Test, group: 'verification', description: 'Runs the integration tests.') {
+    testClassesDirs = sourceSets.integrationTest.output.classesDirs
+    classpath = sourceSets.integrationTest.runtimeClasspath
+    mustRunAfter test
+}
+
+check.dependsOn integrationTest
