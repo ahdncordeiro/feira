@@ -1,0 +1,23 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: 'andrecordeiro'
+      changes:
+        - createTable:
+            tableName: 'item'
+            columns:
+              - column:
+                  name: 'id'
+                  type: 'int'
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: 'uuid'
+                  type: 'uuid'
+              - column:
+                  name: 'name'
+                  type: 'varchar(255)'
+                  constraints:
+                    nullable: false

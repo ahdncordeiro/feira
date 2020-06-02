@@ -3,4 +3,10 @@ management:
     enabled-by-default: true
     web:
       exposure:
-        include: "*"
+        include: '*'
+
+spring:
+  datasource:
+    url: 'jdbc:postgresql://localhost:5432/postgres'
+    username: 'postgres'
+    password: 'postgres'
