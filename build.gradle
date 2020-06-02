@@ -1,5 +1,6 @@
 plugins {
     id 'application'
+    id 'com.avast.gradle.docker-compose' version '0.12.1'
     id 'idea'
     id 'io.spring.dependency-management' version '1.0.9.RELEASE'
     id 'java'
@@ -13,22 +14,21 @@ repositories {
 group = 'com.andrecordeiro'
 version = '0.0.1-SNAPSHOT'
 
-apply plugin: 'application'
-apply plugin: 'idea'
-apply plugin: 'io.spring.dependency-management'
-apply plugin: 'java'
-
 java {
     sourceCompatibility = JavaVersion.VERSION_14
     targetCompatibility = JavaVersion.VERSION_14
-    withJavadocJar() //TODO verificar
-    withSourcesJar() //TODO verificar
+    withJavadocJar()
+    withSourcesJar()
+}
+
+application {
+    mainClassName 'com.andrecordeiro.items.ItemsApplication'
 }
 
 sourceSets {
     integrationTest {
-        compileClasspath += sourceSets.main.output + configurations.testCompile
-        runtimeClasspath += sourceSets.main.output + configurations.testRuntime
+        compileClasspath += sourceSets.main.output + sourceSets.test.output
+        runtimeClasspath += sourceSets.main.output + sourceSets.test.output
     }
 }
 
@@ -41,12 +41,26 @@ idea {
 }
 
 configurations {
+    testAnnotationProcessor.extendsFrom annotationProcessor
+    testCompileOnly.extendsFrom compileOnly
+
+    integrationTestAnnotationProcessor.extendsFrom testAnnotationProcessor
+    integrationTestCompileOnly.extendsFrom testCompileOnly
     integrationTestImplementation.extendsFrom testImplementation
     integrationTestRuntimeOnly.extendsFrom testRuntimeOnly
 }
 
 dependencies {
+    annotationProcessor 'org.projectlombok:lombok:1.18.12'
+
+    compileOnly 'org.jetbrains:annotations:19.0.0'
+    compileOnly 'org.projectlombok:lombok:1.18.12'
+
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+
+    implementation 'org.postgresql:postgresql:42.2.1'
     implementation 'org.springframework.boot:spring-boot-starter'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
 //    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-web'
 
@@ -62,7 +76,8 @@ test {
 task integrationTest(type: Test, group: 'verification', description: 'Runs the integration tests.') {
     testClassesDirs = sourceSets.integrationTest.output.classesDirs
     classpath = sourceSets.integrationTest.runtimeClasspath
-    mustRunAfter test
+    shouldRunAfter test
+    useJUnitPlatform()
 }
-
+dockerCompose.isRequiredBy(integrationTest) // hooks 'dependsOn composeUp' and 'finalizedBy composeDown'
 check.dependsOn integrationTest
