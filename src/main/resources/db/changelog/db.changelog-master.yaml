@@ -12,10 +12,11 @@ databaseChangeLog:
                   autoIncrement: true
                   constraints:
                     primaryKey: true
-                    nullable: false
               - column:
                   name: 'uuid'
                   type: 'uuid'
+                  constraints:
+                    nullable: false
               - column:
                   name: 'name'
                   type: 'varchar(255)'
