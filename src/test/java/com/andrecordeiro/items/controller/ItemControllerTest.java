@@ -7,6 +7,7 @@ import static org.mockito.Mockito.when;
 import com.andrecordeiro.items.service.ItemService;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.modelmapper.ModelMapper;
 
 public class ItemControllerTest {
 
@@ -15,7 +16,7 @@ public class ItemControllerTest {
     // given
     var itemServiceMock = Mockito.mock(ItemService.class);
     when(itemServiceMock.findAll()).thenReturn(of());
-    var itemController = new ItemController(itemServiceMock);
+    var itemController = new ItemController(itemServiceMock, new ModelMapper());
 
     // when
     var result = itemController.getItems(null);
